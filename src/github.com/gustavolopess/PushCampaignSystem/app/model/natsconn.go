@@ -1,10 +1,10 @@
 package model
 
 import (
-	"fmt"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"github.com/nats-io/go-nats-streaming"
+	"io/ioutil"
 	"log"
 )
 
@@ -20,12 +20,15 @@ type NatsConn struct {
 	DurableName string	`json:"durable_name"` // only used by subscriber
 }
 
+// publisher/subscriber connection
 var (
-	pubQueue stan.Conn
-	subQueue stan.Conn
+	queue stan.Conn
+)
 
-	PUB_QUEUE = "PUB_QUEUE"
-	SUB_QUEUE = "SUB_QUEUE"
+// constants to indicate which kind of connection must be initiated
+const (
+	PubQueue = "PUB_QUEUE"
+	SubQeueue = "SUB_QUEUE"
 )
 
 // read config from JSON file at specified path
@@ -43,38 +46,36 @@ func (c *NatsConn) LoadConfig(configPath string) {
 
 func (c *NatsConn) Connect(queueType string) {
 	url := fmt.Sprintf("nats://%s:%d", c.Host, c.Port)
-	queue, err := stan.Connect(c.ClusterID, c.ClientID, stan.NatsURL(url))
+	var err error
+	queue, err = stan.Connect(c.ClusterID, c.ClientID, stan.NatsURL(url))
 
 	if err != nil {
 		log.Fatalf("Could not connect to NATS streaming server: %s", err.Error())
 	}
 
-	switch queueType {
-	case PUB_QUEUE:
-		pubQueue = queue
-		break
-	case SUB_QUEUE:
-		subQueue = queue
-		break
-	default:
-		log.Fatalf("Invalid queue type")
+	if queueType == SubQeueue {
+		c.subscribe()
 	}
+}
 
+
+func (c *NatsConn) subscribe() {
+	_, err := queue.Subscribe(c.Subject, func(m *stan.Msg){
+
+	}, stan.DurableName(c.DurableName))
+
+	if err != nil {
+		log.Fatalf("Could not subscribe push notification messages from NATS: %s", err.Error())
+	}
 }
 
 // Publish push notification message to stream queue
 func (c *NatsConn) Publish(msg []byte) error {
-	return pubQueue.Publish(c.Subject, msg)
+	return queue.Publish(c.Subject, msg)
 }
 
 
-// returns publisher connection object
-func PublisherConnection() stan.Conn {
-	return pubQueue
-}
-
-
-// returns subscriber connection object
-func SubscriberConnection() stan.Conn {
-	return subQueue
+// returns connection object
+func Connection() stan.Conn {
+	return queue
 }
