@@ -1,13 +1,20 @@
 BASE_PATH       	:= $(shell pwd | sed 's/ /\\ /g')
-BASE_PACKAGE_SRC 	:= $(BASE_PATH)/src/github.com/gustavolopess/PushCampaignSystem
+BASE_PACKAGE		:= github.com/gustavolopess/PushCampaignSystem
+BASE_PACKAGE_SRC 	:= src/$(BASE_PACKAGE)
 
-PUBLISHER_MAIN 		:= $(BASE_PACKAGE_SRC)/cmd/pub/main.go
-SUBSCRIBER_MAIN		:= $(BASE_PACKAGE_SRC)/cmd/sub/main.go
+PUBLISHER_MAIN 		:= ./cmd/pub/
+SUBSCRIBER_MAIN		:= ./cmd/sub/
 
 PUBLISHER_BIN		:= publisher
 SUBSCRIBER_BIN		:= subscriber
 
-all: build run-publisher run-subscriber
+all: mod build run-publisher run-subscriber
+
+mod:
+	@cd $(BASE_PACKAGE_SRC) && go mod init $(BASE_PACKAGE)
+
+deps:
+	@cd $(BASE_PACKAGE_SRC) && go build ./...
 
 build:
 	@mkdir -p bin
