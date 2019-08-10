@@ -2,19 +2,19 @@ package main
 
 import (
 	"flag"
+	"github.com/gustavolopess/PushCampaignSystem/app/model"
 	"os"
-	"github.com/gustavolopess/PushCampaignSystem/config"
 	"os/signal"
 )
 
 func main() {
 	// command line flags
-	natsConfigPath := flag.String("natsconfig", "etc/queue", "Path to file with NATS configuration")
+	natsConfigPath := flag.String("natsconfig", "etc/queue.json", "Path to file with NATS configuration")
 	flag.Parse()
 
 	// init NATS configuration instance
-	var natsConfig config.NatsConfig
-	natsConfig.LoadConfig(*natsConfigPath)
+	var natsConn model.NatsConn
+	natsConn.LoadConfig(*natsConfigPath)
 
 
 	// subscribe to SIGINT signals
