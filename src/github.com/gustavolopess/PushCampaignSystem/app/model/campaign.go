@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 )
@@ -14,6 +15,7 @@ type Campaign struct {
 }
 
 
+// Returns an array of campaigns from input file
 func LoadCampaigns(filePath string) (campaigns []Campaign, err error) {
 	fileData, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -24,7 +26,8 @@ func LoadCampaigns(filePath string) (campaigns []Campaign, err error) {
 	return
 }
 
-
-func (c *Campaign) Store() {
-
+// Store campaign on database
+func (c *Campaign) Store() (err error) {
+	_, err = MongoCollection().InsertOne(context.TODO(), *c)
+	return
 }

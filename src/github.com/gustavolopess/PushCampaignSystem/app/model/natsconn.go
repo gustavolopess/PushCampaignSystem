@@ -1,10 +1,10 @@
 package model
 
 import (
-	"fmt"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"github.com/nats-io/go-nats-streaming"
+	"io/ioutil"
 	"log"
 )
 
