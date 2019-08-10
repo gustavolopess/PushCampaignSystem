@@ -33,7 +33,19 @@ func (c *Campaign) Store() (err error) {
 	return
 }
 
+// Store multiple campaigns
+func StoreMultipleCampaigns(campaigns []Campaign) (err error) {
+	campaignsToStore := make([]interface{}, len(campaigns))
+	for i, c := range campaigns {
+		campaignsToStore[i] = c
+	}
 
+	_, err = MongoCollection().InsertMany(context.TODO(), campaignsToStore)
+	return
+}
+
+
+// Search campaigns by visit/targeting
 func SearchCampaignsByVisit(visit Visit) (results []*Campaign, err error) {
 
 	cursor, err := MongoCollection().Find(context.TODO(), bson.M{"targeting.place_id": visit.PlaceId})
