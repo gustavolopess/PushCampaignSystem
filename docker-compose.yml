@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  nats-streaming:
+    image: "nats-streaming:0.15.1-linux"
+    restart: always
+    ports:
+      - 4223:4222
+    volumes:
+      - ./nats.conf:/nats.conf:ro
+    command: ['-store', 'nats.conf']
+
+  mongodb:
+    image: "mongo:3.6.3"
+    restart: always
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    ports:
+      - 27018:27017
