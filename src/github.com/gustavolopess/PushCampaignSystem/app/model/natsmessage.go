@@ -6,9 +6,10 @@ import (
 
 // Nats message model
 type NatsMessage struct {
-	Provider 	string	`json:"string"`
-	Message 	string	`json:"string"`
-	DeviceId	string 	`json:"string"`
+	VisitId			int64  `json:"visit_id"`
+	Provider 		string	`json:"provider"`
+	PushMessage 	string	`json:"push_message"`
+	DeviceId		string 	`json:"device_id"`
 }
 
 

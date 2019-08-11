@@ -32,19 +32,21 @@ func main() {
 	natsConn.LoadConfig(*natsConfigPath)
 	natsConn.Connect(model.PubQueue)
 
-	// init MongoDB
+	// Init MongoDB
 	var mongoConn model.MongoConn
 	mongoConn.LoadConfig(*mongoConfigPath)
 	mongoConn.Connect()
 
+	// Tail log file with visits
 	logFileTail := controller.TailVisitLogFile(*visitLogPath)
 	for line := range logFileTail {
 		go func() {
 			visit, campaigns := controller.SearchCampaignsByLogLine(line.Text)
 			for _, c := range campaigns {
 				natsMessage := &model.NatsMessage{
+					VisitId: visit.ID,
 					Provider: c.Provider,
-					Message:  c.PushMessage,
+					PushMessage:  c.PushMessage,
 					DeviceId: visit.DeviceId,
 				}
 				go controller.EnqueueMessageIntoNats(natsMessage, &natsConn)
