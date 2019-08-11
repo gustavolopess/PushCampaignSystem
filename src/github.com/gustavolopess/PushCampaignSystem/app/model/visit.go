@@ -17,10 +17,10 @@ var logLineRegex = regexp.MustCompile(`(?i)Visit:[\s\,]+?id=(?P<id>\d+)[\s\,]+?d
 
 
 // Receives a log line and returns a Visit
-func ParseLogLine(line string) (visit *Visit, err error) {
+func ParseVisitLogLine(line string) (visit *Visit, err error) {
 	match := logLineRegex.FindStringSubmatch(line)
-	matchedID, err := strconv.Atoi(match[0])
-	matchedPlaceID, err := strconv.Atoi(match[1])
+	matchedID, err := strconv.Atoi(match[1])
+	matchedPlaceID, err := strconv.Atoi(match[3])
 	if err != nil {
 		return
 	}

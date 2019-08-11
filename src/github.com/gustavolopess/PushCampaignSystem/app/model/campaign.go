@@ -13,9 +13,9 @@ import (
 // model campaign
 type Campaign struct {
 	ID          int64  	`json:"id" bson:"_id"`
-	Provider    string 	`json:"provider"`
-	PushMessage string 	`json:"push_message"`
-	Targeting	[]Place	`json:"targeting"`
+	Provider    string 	`json:"provider" bson:"provider"`
+	PushMessage string 	`json:"push_message" bson:"push_message"`
+	Targeting	[]Place	`json:"targeting" bson:"targeting"`
 }
 
 
@@ -79,7 +79,7 @@ func StoreMultipleCampaigns(campaigns []Campaign, mongoCollection *mongo.Collect
 
 
 // Search campaigns by visit/targeting
-func SearchCampaignsByVisit(visit Visit) (results []*Campaign, err error) {
+func SearchCampaignsByVisit(visit *Visit) (results []*Campaign, err error) {
 
 	// Search campaigns which contains the visit's place into its targeting
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
