@@ -49,7 +49,7 @@ func main() {
 					PushMessage:  c.PushMessage,
 					DeviceId: visit.DeviceId,
 				}
-				go controller.EnqueueMessageIntoNats(natsMessage, &natsConn)
+				go controller.EnqueueMessageIntoNats(&natsConn, natsMessage)
 			}
 		}()
 	}
