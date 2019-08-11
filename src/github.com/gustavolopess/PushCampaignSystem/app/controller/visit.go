@@ -33,8 +33,8 @@ func SearchCampaignsByLogLine(line string) (*model.Visit, []*model.Campaign) {
 }
 
 // Insert message into NATS pub queue
-func EnqueueMessageIntoNats(natsMessage *model.NatsMessage, natsConn *model.NatsConn) {
-	_, err := natsMessage.EnqueueIntoNats(natsConn)
+func EnqueueMessageIntoNats(natsConn *model.NatsConn, natsMessage *model.NatsMessage) {
+	err := natsConn.Publish(natsMessage)
 	if err != nil {
 		log.Fatalf("Could not enqueue message %#v into NATS streaming: %s", natsMessage, err.Error())
 	}

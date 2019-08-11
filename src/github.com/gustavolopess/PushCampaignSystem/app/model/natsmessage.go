@@ -27,17 +27,6 @@ func (n *NatsMessage) LoadMessage(data []byte) (err error) {
 	return
 }
 
-func (n *NatsMessage) EnqueueIntoNats(natsConn *NatsConn) (message []byte, err error) {
-	// Struct to JSON
-	message, err = json.Marshal(n)
-	if err != nil {
-		return
-	}
-
-	// Enqueue JSON into Nats streaming
-	err = natsConn.Publish(message)
-	return
-}
 
 func OnMessage(data []byte) {
 	// Unmarshal message
@@ -63,5 +52,6 @@ func OnMessage(data []byte) {
 		strings.Title(natsMessage.Provider),
 		natsMessage.PushMessage,
 		natsMessage.DeviceId)
+
 	provider.SendPushNotification(pushMessage)
 }

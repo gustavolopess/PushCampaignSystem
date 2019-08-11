@@ -27,8 +27,8 @@ var (
 
 // constants to indicate which kind of connection must be initiated
 const (
-	PubQueue = "PUB_QUEUE"
-	SubQeueue = "SUB_QUEUE"
+	PubQueue = "pub-queue"
+	SubQeueue = "sub-queue"
 )
 
 // read config from JSON file at specified path
@@ -37,7 +37,7 @@ func (c *NatsConn) LoadConfig(configPath string) {
 	if err != nil {
 		log.Fatalf("Could not read NATS config file: %s", err.Error())
 	}
-	err = json.Unmarshal([]byte(file), c)
+	err = json.Unmarshal([]byte(file), &c)
 	if err != nil {
 		log.Fatalf("Invalid NATS config file: %s", err.Error())
 	}
@@ -48,24 +48,24 @@ func (c *NatsConn) Connect(queueType string) {
 	log.Println("Establishing new connection with NATS streaming server...")
 
 	url := fmt.Sprintf("nats://%s:%d", c.Host, c.Port)
+
+	// Avoid pub and sub use same clientID
+	clientId := fmt.Sprintf("%s-%s", c.ClientID, queueType)
+
 	var err error
-	queue, err = stan.Connect(c.ClusterID, c.ClientID, stan.NatsURL(url))
+	queue, err = stan.Connect(c.ClusterID, clientId, stan.NatsURL(url))
 
 	if err != nil {
 		log.Fatalf("Could not connect to NATS streaming server: %s", err.Error())
-	}
-
-	if queueType == SubQeueue {
-		c.subscribe()
 	}
 
 	log.Println("Connection with NATS established")
 }
 
 
-func (c *NatsConn) subscribe() {
+func (c *NatsConn) Subscribe(onMessage func(data []byte)) {
 	_, err := queue.Subscribe(c.Subject, func(m *stan.Msg){
-
+		onMessage(m.Data)
 	}, stan.DurableName(c.DurableName))
 
 	if err != nil {
@@ -74,8 +74,17 @@ func (c *NatsConn) subscribe() {
 }
 
 // Publish push notification message to stream queue
-func (c *NatsConn) Publish(msg []byte) error {
-	return queue.Publish(c.Subject, msg)
+func (c *NatsConn) Publish(natsMessage *NatsMessage) (err error) {
+	// Marshal NATS message
+	msg, err := json.Marshal(natsMessage)
+	if err != nil {
+		return
+	}
+
+	// Send message to NATS
+	err = queue.Publish(c.Subject, msg)
+
+	return
 }
 
 
