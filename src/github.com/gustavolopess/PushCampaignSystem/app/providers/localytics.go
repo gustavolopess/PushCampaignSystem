@@ -7,7 +7,7 @@ import (
 
 type Localytics struct {}
 
-func (l Localytics) SendPushNotification(natsMessage *model.NatsMessage) {
+func (l *Localytics) SendPushNotification(natsMessage *model.NatsMessage) {
 	fmt.Printf(`
 		=> Push sent regarding visit %d\n
 		===> Device ID: "%s"\n

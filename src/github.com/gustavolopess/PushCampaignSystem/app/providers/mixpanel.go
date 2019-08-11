@@ -7,7 +7,7 @@ import (
 
 type MixPanel struct {}
 
-func (m MixPanel) SendPushNotification(natsMessage *model.NatsMessage) {
+func (m *MixPanel) SendPushNotification(natsMessage *model.NatsMessage) {
 	fmt.Printf(`
 		=> Push sent regarding visit %d\n
 		===> Device ID: "%s"\n
