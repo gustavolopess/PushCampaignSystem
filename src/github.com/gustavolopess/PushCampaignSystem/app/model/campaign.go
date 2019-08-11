@@ -1,8 +1,9 @@
-package model
+package campaign
 
 import (
 	"context"
 	"encoding/json"
+	"github.com/gustavolopess/PushCampaignSystem/app/model/place"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,7 +16,7 @@ type Campaign struct {
 	ID          int64  	`json:"id" bson:"_id"`
 	Provider    string 	`json:"provider" bson:"provider"`
 	PushMessage string 	`json:"push_message" bson:"push_message"`
-	Targeting	[]Place	`json:"targeting" bson:"targeting"`
+	Targeting	[]place.Place	`json:"targeting" bson:"targeting"`
 }
 
 

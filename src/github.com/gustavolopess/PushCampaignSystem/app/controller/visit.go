@@ -2,7 +2,6 @@ package controller
 
 import (
 	"github.com/gustavolopess/PushCampaignSystem/app/model"
-	providerFactory "github.com/gustavolopess/PushCampaignSystem/app/providers/factory"
 	"github.com/hpcloud/tail"
 	"log"
 )
@@ -43,14 +42,8 @@ func EnqueueMessageIntoNats(natsMessage *model.NatsMessage, natsConn *model.Nats
 	log.Printf("Message %#v successfuly enqueued into NATS streaming\n", natsMessage)
 }
 
-// Send push notification
-func SendPushNotification(natsMessage *model.NatsMessage) {
-	provider, err := providerFactory.GetProvider(natsMessage.Provider)
 
-	if err != nil {
-		log.Printf("Could not send push notification: %s", err.Error())
-	} else {
-		provider.SendPushNotification(natsMessage)
-	}
+// Consume messages from NATS sub queue
+func DequeueMessagesFromNats(natsConn *model.NatsConn) {
+	natsConn.Subscribe(model.OnMessage)
 }
-

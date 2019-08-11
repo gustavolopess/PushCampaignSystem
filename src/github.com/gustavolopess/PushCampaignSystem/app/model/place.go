@@ -1,4 +1,4 @@
-package model
+package place
 
 // place model
 type Place struct {
