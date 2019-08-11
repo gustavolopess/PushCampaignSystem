@@ -45,6 +45,8 @@ func (c *NatsConn) LoadConfig(configPath string) {
 
 
 func (c *NatsConn) Connect(queueType string) {
+	log.Println("Establishing new connection with NATS streaming server...")
+
 	url := fmt.Sprintf("nats://%s:%d", c.Host, c.Port)
 	var err error
 	queue, err = stan.Connect(c.ClusterID, c.ClientID, stan.NatsURL(url))
@@ -56,6 +58,8 @@ func (c *NatsConn) Connect(queueType string) {
 	if queueType == SubQeueue {
 		c.subscribe()
 	}
+
+	log.Println("Connection with NATS established")
 }
 
 

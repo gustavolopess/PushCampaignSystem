@@ -1,7 +1,7 @@
 {
-  "host": "127.0.0.1",
+  "host": "localhost",
   "port": 4223,
-  "cluster_id": "publish-campaign-cluster",
+  "cluster_id": "test-cluster",
   "client_id": "publish-campaign-client",
   "subject": "subject",
   "durable_name": "publish-campaign-durable"

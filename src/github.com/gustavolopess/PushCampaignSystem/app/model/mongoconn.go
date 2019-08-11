@@ -34,6 +34,8 @@ func (m *MongoConn) LoadConfig(configPath string) {
 
 // Instance a new connection with MongoDB
 func (m *MongoConn) Connect() {
+	log.Println("Establishing new connection with MongoDB...")
+
 	// Set client options
 	clientOptions := options.Client().ApplyURI(m.Url)
 
@@ -53,6 +55,8 @@ func (m *MongoConn) Connect() {
 
 	// Instance ref to collection
 	collection = client.Database(m.Database).Collection(m.Collection)
+
+	log.Println("Connection with MongoDB established")
 }
 
 // Return object to MongoDB collection
