@@ -3,8 +3,61 @@ package controller
 import (
 	"github.com/gustavolopess/PushCampaignSystem/app/model"
 	"github.com/hpcloud/tail"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
+
+// Orchestrate visits computation
+func ProcessVisitsFromLog(visitsLogPath string, natsConn *model.NatsConn, campaignMongoCollection, visitMongoCollection *mongo.Collection) {
+
+	// Tail visits log file
+	logFileTail := TailVisitLogFile(visitsLogPath)
+	for line := range logFileTail {
+
+		go func() {
+			// Parse line to visit
+			visit, err := model.ParseVisitFromLogLine(line.Text)
+			if err != nil {
+				log.Fatalf("Could not parse line '%s': %s", line, err.Error())
+			}
+
+			// If this visit has been processed in the past, ignore it
+			if visit.HasBeenProcessed(visitMongoCollection) {
+				log.Printf("Visit with ID %d has been processed in the past. Ignoring.", visit.ID)
+				return
+			}
+
+			// List campaigns with targeting containing visit's PlaceId
+			campaigns, err := visit.ListCampaigns(campaignMongoCollection)
+			if err != nil {
+				log.Printf("Could not search campaign with visit %#v: %s. Ignoring", visit, err.Error())
+				return
+			}
+
+			if len(campaigns) > 0 {
+				// If it has campaigns, send messages to NATS with flag HasCampaign set to true
+				for _, c := range campaigns {
+					natsMessage := &model.NatsMessage{
+						VisitId: visit.ID,
+						Provider: c.Provider,
+						PushMessage:  c.PushMessage,
+						DeviceId: visit.DeviceId,
+						HasCampaign: true,
+					}
+					go EnqueueMessageIntoNats(natsConn, natsMessage)
+				}
+			} else {
+				// If it hasn't campaigns, send messages to NATS with flag HasCampaign set to false
+				natsMessage := &model.NatsMessage{
+					VisitId: visit.ID,
+					HasCampaign: false,
+				}
+				go EnqueueMessageIntoNats(natsConn, natsMessage)
+			}
+		}()
+
+	}
+}
 
 // Return generator to lines in log file
 func TailVisitLogFile(filePath string) chan *tail.Line {
@@ -14,22 +67,6 @@ func TailVisitLogFile(filePath string) chan *tail.Line {
 	}
 
 	return t.Lines
-}
-
-// Search campaigns which contain same place_id as present in log line
-func SearchCampaignsByLogLine(line string) (*model.Visit, []*model.Campaign) {
-	// Parse line to visit
-	visit, err := model.ParseVisitLogLine(line)
-	if err != nil {
-		log.Fatalf("Could not parse line '%s': %s", line, err.Error())
-	}
-
-	campaigns, err := model.SearchCampaignsByVisit(visit)
-	if err != nil {
-		log.Fatalf("Could not search campaign with visit %#v: %s", visit, err.Error())
-	}
-
-	return visit, campaigns
 }
 
 // Insert message into NATS pub queue

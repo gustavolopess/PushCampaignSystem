@@ -26,5 +26,5 @@ func main() {
 	mongoConn.Connect()
 
 	// Store campaigns from file
-	controller.StoreCampaignsFromFile(*filePath, model.MongoCollection())
+	controller.StoreCampaignsFromFile(*filePath, model.CampaignMongoCollection())
 }

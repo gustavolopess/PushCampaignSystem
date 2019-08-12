@@ -37,32 +37,8 @@ func main() {
 	mongoConn.LoadConfig(*mongoConfigPath)
 	mongoConn.Connect()
 
-	// Tail log file with visits
-	logFileTail := controller.TailVisitLogFile(*visitLogPath)
-	for line := range logFileTail {
-		go func() {
-			visit, campaigns := controller.SearchCampaignsByLogLine(line.Text)
-			if len(campaigns) > 0 {
-				for _, c := range campaigns {
-					natsMessage := &model.NatsMessage{
-						VisitId: visit.ID,
-						Provider: c.Provider,
-						PushMessage:  c.PushMessage,
-						DeviceId: visit.DeviceId,
-						HasCampaign: true,
-					}
-					go controller.EnqueueMessageIntoNats(&natsConn, natsMessage)
-				}
-			} else {
-				natsMessage := &model.NatsMessage{
-					VisitId: visit.ID,
-					HasCampaign: false,
-				}
-				go controller.EnqueueMessageIntoNats(&natsConn, natsMessage)
-			}
-		}()
-	}
-
+	// Handle visits
+	controller.ProcessVisitsFromLog(*visitLogPath, &natsConn, model.CampaignMongoCollection(), model.VisitMongoCollection())
 
 	// Subscribe to SIGINT signals
 	interruptChan := make(chan os.Signal)
