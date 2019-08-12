@@ -38,7 +38,7 @@ func main() {
 	mongoConn.Connect()
 
 	// Handle visits
-	controller.ProcessVisitsFromLog(*visitLogPath, &natsConn, config.CampaignMongoCollection(), config.VisitMongoCollection())
+	controller.ProcessVisitsFromLog(*visitLogPath, &natsConn, config.CampaignCollection(), config.VisitCollection())
 
 	// Subscribe to SIGINT signals
 	interruptChan := make(chan os.Signal)

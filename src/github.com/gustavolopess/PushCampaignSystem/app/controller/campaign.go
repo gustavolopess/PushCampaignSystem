@@ -16,7 +16,7 @@ func StoreCampaignsFromFile(filePath string, mongoCollection *mongo.Collection) 
 	}
 
 	// Store all them into database
-	err = campaign.StoreMultipleCampaigns(campaigns, mongoCollection)
+	err = campaign.StoreMultiple(campaigns, mongoCollection)
 	if err != nil {
 		log.Fatalf("Could not inserto campaigns into MongoDB: %s", err.Error())
 	}

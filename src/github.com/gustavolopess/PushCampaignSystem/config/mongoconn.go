@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var client *mongo.Client
+var database *mongo.Database
 var campaignCollection *mongo.Collection
 var visitCollection *mongo.Collection
 
@@ -35,13 +37,14 @@ func (m *MongoConn) LoadConfig(configPath string) {
 // Instance a new connection with MongoDB
 func (m *MongoConn) Connect() {
 	log.Println("Establishing new connection with MongoDB...")
+	var err error
 
 	// Set client options
 	clientOptions := options.Client().ApplyURI(m.Url)
 
 	// Connect to MongoDB
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(ctx, clientOptions)
+	client, err = mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatalf("Could not connect to MongoDB: %s", err.Error())
 	}
@@ -60,12 +63,22 @@ func (m *MongoConn) Connect() {
 	log.Println("Connection with MongoDB established")
 }
 
+// Return object to MongoDB client
+func Client() *mongo.Client {
+	return client
+}
+
+// Return object to MongoDB database
+func Database() *mongo.Database {
+	return database
+}
+
 // Return object to MongoDB campaignCollection
-func CampaignMongoCollection() *mongo.Collection {
+func CampaignCollection() *mongo.Collection {
 	return campaignCollection
 }
 
 // Return object to MongoDB visitCollection
-func VisitMongoCollection() *mongo.Collection {
+func VisitCollection() *mongo.Collection {
 	return visitCollection
 }

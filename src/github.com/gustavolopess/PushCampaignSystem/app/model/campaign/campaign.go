@@ -37,7 +37,7 @@ func LoadCampaigns(filePath string) (campaigns []Campaign, err error) {
 }
 
 // Store campaign on database
-func (c *Campaign) StoreOne(mongoCollection *mongo.Collection) (err error) {
+func (c *Campaign) Store(mongoCollection *mongo.Collection) (err error) {
 	// Uses upsert to update if it exists and create if doesn't and avoid existent key error
 	updateOptions := &options.UpdateOptions{}
 	updateOptions = updateOptions.SetUpsert(true)
@@ -57,7 +57,7 @@ func (c *Campaign) StoreOne(mongoCollection *mongo.Collection) (err error) {
 }
 
 // Store multiple campaigns
-func StoreMultipleCampaigns(campaigns []Campaign, mongoCollection *mongo.Collection) (err error) {
+func StoreMultiple(campaigns []Campaign, mongoCollection *mongo.Collection) (err error) {
 	var operations []mongo.WriteModel
 
 	// Uses upsert to update if it exists and create if doesn't and avoid existent key error
