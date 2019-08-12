@@ -12,12 +12,14 @@ import (
 )
 
 var client *mongo.Client
-var collection *mongo.Collection
+var campaignCollection *mongo.Collection
+var visitCollection *mongo.Collection
 
 type MongoConn struct {
-	Url string	`json:"url"`
-	Database string `json:"database"`
-	Collection string `json:"collection"`
+	Url                	string 	`json:"url"`
+	Database           	string 	`json:"database"`
+	CampaignCollection 	string 	`json:"campaign_collection"`
+	VisitCollection		string	`json:"visit_collection"`
 }
 
 // read config from JSON file at specified path
@@ -53,13 +55,19 @@ func (m *MongoConn) Connect() {
 		log.Fatalf("Could not discovery a MongoDB server: %s", err.Error())
 	}
 
-	// Instance ref to collection
-	collection = client.Database(m.Database).Collection(m.Collection)
+	// Instance ref to campaignCollection
+	campaignCollection = client.Database(m.Database).Collection(m.CampaignCollection)
+	visitCollection = client.Database(m.Database).Collection(m.VisitCollection)
 
 	log.Println("Connection with MongoDB established")
 }
 
-// Return object to MongoDB collection
-func MongoCollection() *mongo.Collection {
-	return collection
+// Return object to MongoDB campaignCollection
+func CampaignMongoCollection() *mongo.Collection {
+	return campaignCollection
+}
+
+// Return object to MongoDB visitCollection
+func VisitMongoCollection() *mongo.Collection {
+	return visitCollection
 }
