@@ -1,4 +1,4 @@
-package model
+package natsmessage
 
 import (
 	"encoding/json"

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/gustavolopess/PushCampaignSystem/app/controller"
-	"github.com/gustavolopess/PushCampaignSystem/app/model"
+	"github.com/gustavolopess/PushCampaignSystem/config"
 	"os"
 	"os/signal"
 )
@@ -17,9 +17,9 @@ func main() {
 	flag.Parse()
 
 	// Init NATS configuration instance and connect to streaming server
-	var natsConn model.NatsConn
+	var natsConn config.NatsConn
 	natsConn.LoadConfig(*natsConfigPath)
-	natsConn.Connect(model.SubQeueue)
+	natsConn.Connect(config.SubQeueue)
 
 	// Subscribe to NATS messages
 	controller.DequeueMessagesFromNats(&natsConn)

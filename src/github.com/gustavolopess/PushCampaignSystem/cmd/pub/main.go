@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/gustavolopess/PushCampaignSystem/app/controller"
-	"github.com/gustavolopess/PushCampaignSystem/app/model"
+	"github.com/gustavolopess/PushCampaignSystem/config"
 	"os"
 	"os/signal"
 )
@@ -28,17 +28,17 @@ func main() {
 	flag.Parse()
 
 	// Init NATS configuration instance
-	var natsConn model.NatsConn
+	var natsConn config.NatsConn
 	natsConn.LoadConfig(*natsConfigPath)
-	natsConn.Connect(model.PubQueue)
+	natsConn.Connect(config.PubQueue)
 
 	// Init MongoDB
-	var mongoConn model.MongoConn
+	var mongoConn config.MongoConn
 	mongoConn.LoadConfig(*mongoConfigPath)
 	mongoConn.Connect()
 
 	// Handle visits
-	controller.ProcessVisitsFromLog(*visitLogPath, &natsConn, model.CampaignMongoCollection(), model.VisitMongoCollection())
+	controller.ProcessVisitsFromLog(*visitLogPath, &natsConn, config.CampaignMongoCollection(), config.VisitMongoCollection())
 
 	// Subscribe to SIGINT signals
 	interruptChan := make(chan os.Signal)

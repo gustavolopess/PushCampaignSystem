@@ -1,8 +1,9 @@
-package model
+package config
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gustavolopess/PushCampaignSystem/app/model/natsmessage"
 	"github.com/nats-io/go-nats-streaming"
 	"io/ioutil"
 	"log"
@@ -74,7 +75,7 @@ func (c *NatsConn) Subscribe(onMessage func(data []byte)) {
 }
 
 // Publish push notification message to stream queue
-func (c *NatsConn) Publish(natsMessage *NatsMessage) (err error) {
+func (c *NatsConn) Publish(natsMessage *natsmessage.NatsMessage) (err error) {
 	// Marshal NATS message
 	msg, err := json.Marshal(natsMessage)
 	if err != nil {

@@ -3,7 +3,6 @@ package campaign
 import (
 	"context"
 	"encoding/json"
-	"github.com/gustavolopess/PushCampaignSystem/app/model/place"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -11,12 +10,18 @@ import (
 	"time"
 )
 
+// place model
+type Place struct {
+	PlaceId     int64  `json:"place_id" bson:"place_id"`
+	Description string `json:"description" bson:"description"`
+}
+
 // model campaign
 type Campaign struct {
 	ID          int64  	`json:"id" bson:"_id"`
 	Provider    string 	`json:"provider" bson:"provider"`
 	PushMessage string 	`json:"push_message" bson:"push_message"`
-	Targeting	[]place.Place	`json:"targeting" bson:"targeting"`
+	Targeting	[]Place	`json:"targeting" bson:"targeting"`
 }
 
 
@@ -74,34 +79,6 @@ func StoreMultipleCampaigns(campaigns []Campaign, mongoCollection *mongo.Collect
 	// Bulk write to mitigate lacks of performance
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	_, err = mongoCollection.BulkWrite(ctx, operations)
-
-	return
-}
-
-
-// Search campaigns by visit/targeting
-func SearchCampaignsByVisit(visit *Visit) (results []*Campaign, err error) {
-
-	// Search campaigns which contains the visit's place into its targeting
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	cursor, err := MongoCollection().Find(ctx, bson.M{"targeting.place_id": visit.PlaceId})
-	if err != nil {
-		return
-	}
-	defer cursor.Close(ctx)
-
-	// Decode results into array of campaigns
-	for cursor.Next(ctx) {
-		// object to receive decoded document
-		var campaign Campaign
-		err = cursor.Decode(&campaign)
-		if err != nil {
-			return
-		}
-
-		results = append(results, &campaign)
-	}
-	err = cursor.Err()
 
 	return
 }

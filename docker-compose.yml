@@ -8,7 +8,7 @@ services:
       - 4223:4222
       - 8222:8222
     volumes:
-      - ./nats.conf:/nats.conf
+      - ./etc/nats.conf:/nats.conf
     command: ['-c', '/nats.conf']
 
   mongodb:

@@ -1,14 +1,16 @@
 package controller
 
 import (
-	"github.com/gustavolopess/PushCampaignSystem/app/model"
+	"github.com/gustavolopess/PushCampaignSystem/app/model/natsmessage"
+	visit2 "github.com/gustavolopess/PushCampaignSystem/app/model/visit"
+	"github.com/gustavolopess/PushCampaignSystem/config"
 	"github.com/hpcloud/tail"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
 
 // Orchestrate visits computation
-func ProcessVisitsFromLog(visitsLogPath string, natsConn *model.NatsConn, campaignMongoCollection, visitMongoCollection *mongo.Collection) {
+func ProcessVisitsFromLog(visitsLogPath string, natsConn *config.NatsConn, campaignMongoCollection, visitMongoCollection *mongo.Collection) {
 
 	// Tail visits log file
 	logFileTail := TailVisitLogFile(visitsLogPath)
@@ -16,7 +18,7 @@ func ProcessVisitsFromLog(visitsLogPath string, natsConn *model.NatsConn, campai
 
 		go func() {
 			// Parse line to visit
-			visit, err := model.ParseVisitFromLogLine(line.Text)
+			visit, err := visit2.ParseVisitFromLogLine(line.Text)
 			if err != nil {
 				log.Fatalf("Could not parse line '%s': %s", line, err.Error())
 			}
@@ -37,7 +39,7 @@ func ProcessVisitsFromLog(visitsLogPath string, natsConn *model.NatsConn, campai
 			if len(campaigns) > 0 {
 				// If it has campaigns, send messages to NATS with flag HasCampaign set to true
 				for _, c := range campaigns {
-					natsMessage := &model.NatsMessage{
+					natsMessage := &natsmessage.NatsMessage{
 						VisitId: visit.ID,
 						Provider: c.Provider,
 						PushMessage:  c.PushMessage,
@@ -48,7 +50,7 @@ func ProcessVisitsFromLog(visitsLogPath string, natsConn *model.NatsConn, campai
 				}
 			} else {
 				// If it hasn't campaigns, send messages to NATS with flag HasCampaign set to false
-				natsMessage := &model.NatsMessage{
+				natsMessage := &natsmessage.NatsMessage{
 					VisitId: visit.ID,
 					HasCampaign: false,
 				}
@@ -70,7 +72,7 @@ func TailVisitLogFile(filePath string) chan *tail.Line {
 }
 
 // Insert message into NATS pub queue
-func EnqueueMessageIntoNats(natsConn *model.NatsConn, natsMessage *model.NatsMessage) {
+func EnqueueMessageIntoNats(natsConn *config.NatsConn, natsMessage *natsmessage.NatsMessage) {
 	err := natsConn.Publish(natsMessage)
 	if err != nil {
 		log.Fatalf("Could not enqueue message %#v into NATS streaming: %s", natsMessage, err.Error())
@@ -81,6 +83,6 @@ func EnqueueMessageIntoNats(natsConn *model.NatsConn, natsMessage *model.NatsMes
 
 
 // Consume messages from NATS sub queue
-func DequeueMessagesFromNats(natsConn *model.NatsConn) {
-	natsConn.Subscribe(model.OnMessage)
+func DequeueMessagesFromNats(natsConn *config.NatsConn) {
+	natsConn.Subscribe(natsmessage.OnMessage)
 }

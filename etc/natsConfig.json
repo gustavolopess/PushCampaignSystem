@@ -3,6 +3,6 @@
   "port": 4223,
   "cluster_id": "test-cluster",
   "client_id": "publish-campaign-client",
-  "subject": "subject",
+  "subject": "publish-campaign-subject",
   "durable_name": "publish-campaign-durable"
 }

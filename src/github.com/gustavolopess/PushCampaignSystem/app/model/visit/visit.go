@@ -1,7 +1,8 @@
-package model
+package visit
 
 import (
 	"context"
+	"github.com/gustavolopess/PushCampaignSystem/app/model/campaign"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"regexp"
@@ -39,7 +40,7 @@ func ParseVisitFromLogLine(line string) (visit *Visit, err error) {
 }
 
 // Search campaigns by visit/targeting
-func (v *Visit) ListCampaigns(mongoCollection *mongo.Collection) (results []*Campaign, err error) {
+func (v *Visit) ListCampaigns(mongoCollection *mongo.Collection) (results []*campaign.Campaign, err error) {
 
 	// Search campaigns which contains the visit's place into its targeting
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
@@ -52,7 +53,7 @@ func (v *Visit) ListCampaigns(mongoCollection *mongo.Collection) (results []*Cam
 	// Decode results into array of campaigns
 	for cursor.Next(ctx) {
 		// object to receive decoded document
-		var campaign Campaign
+		var campaign campaign.Campaign
 		err = cursor.Decode(&campaign)
 		if err != nil {
 			return

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/gustavolopess/PushCampaignSystem/app/controller"
-	"github.com/gustavolopess/PushCampaignSystem/app/model"
+	"github.com/gustavolopess/PushCampaignSystem/config"
 )
 
 func main() {
@@ -21,10 +21,10 @@ func main() {
 	flag.Parse()
 
 	// init MongoDB
-	var mongoConn model.MongoConn
+	var mongoConn config.MongoConn
 	mongoConn.LoadConfig(*mongoConfigPath)
 	mongoConn.Connect()
 
 	// Store campaigns from file
-	controller.StoreCampaignsFromFile(*filePath, model.CampaignMongoCollection())
+	controller.StoreCampaignsFromFile(*filePath, config.CampaignMongoCollection())
 }
