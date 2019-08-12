@@ -140,7 +140,7 @@ type PushNotificationProvider interface {
 
 Yet at [provider_factory.go](https://github.com/gustavolopess/PushCampaignSystem/blob/develop/src/github.com/gustavolopess/PushCampaignSystem/app/providers/factory/provider_factory.go)
 there is a map of existent providers:
-```
+```go
 var existentProviders = map[string]PushNotificationProvider{
 	"localytics": &providers.Localytics{},
 	"mixpanel": &providers.MixPanel{},
@@ -237,6 +237,9 @@ The `natsconfig` file must follow this format:
 ```
 
 The JSON values doesn't need to be equal to the values above, these are just examples.
+
+\* To make sure that all messages sent to NATS by publisher will be received by subscriber, it's recommended that both services are running at same time or with few seconds of difference between message publishment time and start of execution
+of subscriber service.
 
 #### 🗺 Project Backlog/Roadmap
 Check our [Trello board](https://trello.com/b/Wl6WaCkk/pushcampaignsystem) with project tasks.
