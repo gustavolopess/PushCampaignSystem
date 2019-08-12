@@ -2,13 +2,12 @@ package factory
 
 import (
 	"fmt"
-	"github.com/gustavolopess/PushCampaignSystem/app/model"
 	"github.com/gustavolopess/PushCampaignSystem/app/providers"
 )
 
 // Interface which defines a provider
 type PushNotificationProvider interface {
-	SendPushNotification(natsMessage *model.NatsMessage)
+	SendPushNotification(pushMessage, deviceId string) (err error)
 }
 
 // Map with existent providers, new providers must be appended
