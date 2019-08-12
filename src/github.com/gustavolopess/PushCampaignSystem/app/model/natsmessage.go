@@ -10,16 +10,22 @@ import (
 
 // Nats message model
 type NatsMessage struct {
-	VisitId			int64  `json:"visit_id"`
-	Provider 		string	`json:"provider"`
-	PushMessage 	string	`json:"push_message"`
-	DeviceId		string 	`json:"device_id"`
+	VisitId			int64  	`json:"visit_id"`
+	Provider 		string	`json:"provider,omitempty"`
+	PushMessage 	string	`json:"push_message,omitempty"`
+	DeviceId		string 	`json:"device_id,omitempty"`
+	HasCampaign		bool	`json:"has_campaign"`
 }
 
-var pushMessageTemplate = `
-=> Push sent regarding visit %d
+var withCampaignOutputTemplate =
+`=> Push sent regarding visit %d
 ===> Device ID: "%s"
 ===> %s logging: { "message": "%s", device_id: "%s" }
+`
+
+var withoutCampaignOutputTemplate =
+`=> Push sent regarding visit %d
+===> No campaign with matching target
 `
 
 func (n *NatsMessage) LoadMessage(data []byte) (err error) {
@@ -36,22 +42,34 @@ func OnMessage(data []byte) {
 		return
 	}
 
+	// Subscriber output
+	var output string
 
-	// Instantiate provider from factory
-	provider, err := factory.GetProvider(natsMessage.Provider)
-	if err != nil {
-		log.Fatalln(err.Error())
-		return
+	// Check if message a registered campaign
+	if natsMessage.HasCampaign {
+		// Instantiate provider from factory
+		provider, err := factory.GetProvider(natsMessage.Provider)
+		if err != nil {
+			log.Fatalln(err.Error())
+			return
+		}
+
+
+		// Send campaign's push notification
+		err = provider.SendPushNotification(natsMessage.PushMessage, natsMessage.DeviceId)
+		if err != nil {
+			log.Println("Could not send push notification: %s", err.Error())
+			return
+		}
+
+		// Prints the "with campaign" output format
+		output = fmt.Sprintf(withCampaignOutputTemplate, natsMessage.VisitId, natsMessage.DeviceId,
+				strings.Title(natsMessage.Provider), natsMessage.PushMessage, natsMessage.DeviceId)
+
+	} else {
+		// Prints the "without campaign" output format
+		output = fmt.Sprintf(withoutCampaignOutputTemplate, natsMessage.VisitId)
 	}
 
-	// Crete push notification message and send it
-	pushMessage := fmt.Sprintf(
-		pushMessageTemplate,
-		natsMessage.VisitId,
-		natsMessage.DeviceId,
-		strings.Title(natsMessage.Provider),
-		natsMessage.PushMessage,
-		natsMessage.DeviceId)
-
-	provider.SendPushNotification(pushMessage)
+	fmt.Println(output)
 }

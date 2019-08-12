@@ -42,12 +42,21 @@ func main() {
 	for line := range logFileTail {
 		go func() {
 			visit, campaigns := controller.SearchCampaignsByLogLine(line.Text)
-			for _, c := range campaigns {
+			if len(campaigns) > 0 {
+				for _, c := range campaigns {
+					natsMessage := &model.NatsMessage{
+						VisitId: visit.ID,
+						Provider: c.Provider,
+						PushMessage:  c.PushMessage,
+						DeviceId: visit.DeviceId,
+						HasCampaign: true,
+					}
+					go controller.EnqueueMessageIntoNats(&natsConn, natsMessage)
+				}
+			} else {
 				natsMessage := &model.NatsMessage{
 					VisitId: visit.ID,
-					Provider: c.Provider,
-					PushMessage:  c.PushMessage,
-					DeviceId: visit.DeviceId,
+					HasCampaign: false,
 				}
 				go controller.EnqueueMessageIntoNats(&natsConn, natsMessage)
 			}
