@@ -110,7 +110,40 @@ the subscriber just prints an output similar to the example below:
 3. __How to organize this architecture in terms of infrastructure?__
     * The services reader, publisher and subscriber can run in different hosts in different subnets. The only advice
     is that MongoDB should be placed at same subnet of publisher, because, since the publisher is the service with largest
-    volume of write and read operations on MongoDB, put them at same subnet will prevent eventual slowness. 
+    volume of write and read operations on MongoDB, put them at same subnet will prevent eventual slowness.
+    
+## 📲 Providers
+This system has an easy way to write new providers to send the push notifications.
+This is reached with help of factory design pattern.
+
+The file [provider_factory.go](https://github.com/gustavolopess/PushCampaignSystem/blob/develop/src/github.com/gustavolopess/PushCampaignSystem/app/providers/factory/provider_factory.go)
+contains the definition of PushNotificationProvider interface:
+```go
+type PushNotificationProvider interface {
+    SendPushNotification(pushMessage, deviceId string) (err error)
+}
+``` 
+
+Yet at [provider_factory.go](https://github.com/gustavolopess/PushCampaignSystem/blob/develop/src/github.com/gustavolopess/PushCampaignSystem/app/providers/factory/provider_factory.go)
+there is a map of existent providers:
+```
+var existentProviders = map[string]PushNotificationProvider{
+	"localytics": &providers.Localytics{},
+	"mixpanel": &providers.MixPanel{},
+}
+```
+When a request to send a push notification through provider `xyz` arrives, the system looks for this provider at 
+`existentProviders` map. If it is exists, an object of type of desired provider is returned and 
+the method `SendPushNotification` is called from it. If it does not exist, 
+an error saying that required provider is invalid is returned.
+
+The method `SendPushNotification` contains the provider's particular implementation to send a push notification to
+the `deviceId` passed as argument.
+
+Therefore, to add a new provider to system just follow these two steps:
+1. Write a struct which implements the `PushNotificationProvider` interface.
+2. Append to `existentProviders` map a new reference to an object of the new provider. 
+Example: `"newprovider": &newproviderpackage.NewProvider{}`
     
 ## 🔨 How to build
 
@@ -189,5 +222,8 @@ The `natsconfig` file must follow this format:
 }
 ```
 
-The JSON values doesn't need to be equal to the values above, these are just examples. 
+The JSON values doesn't need to be equal to the values above, these are just examples.
+
+#### 🗺 Project Backlog/Roadmap
+Check our [Trello board](https://trello.com/b/Wl6WaCkk/pushcampaignsystem) with project tasks.
 
