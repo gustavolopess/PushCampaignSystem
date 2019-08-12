@@ -3,7 +3,7 @@ Ad toy system which allows clients to impact a mobile device when it is at a spe
 
 ## 📃 Description
 
-Clients can contract ad campaigns based on geolocation. These campaigns are defined by an identifier,
+Clients can hire ad campaigns based on geolocation. These campaigns are defined by an identifier,
 a targeting, which is a list of places that must be visited by some device in order to get this device 
 impacted by the campaign, a push message, which the message to be sent via push notification to devices visiting places listed
 in targeting and a provider, which is the push notification provider.
@@ -72,7 +72,8 @@ This system can be visualized as three loosely coupled services: __reader, publi
 any campaign. If it is registered, the publisher sends to [NATS streaming server](https://github.com/nats-io/nats-streaming-server)
 a message with `visit_id`, `provider`, `push_message` and `device_id`. If it is not registered, the publisher
 sends a message with `visit_id` and the flag `has_campaign` set to false to indicate that the `place_id` does not belong to
-any campaign. The Golang struct of the message that can be sent to NATS is defined below:
+any campaign. After send visit to NATS, the publisher insert it on MongoDB to keep track of already processed visits. 
+The Golang struct of the message that can be sent to NATS is defined below:
 ```go
 type NatsMessage struct {
     VisitId             int64   `json:"visit_id"`
@@ -90,3 +91,103 @@ the subscriber just prints an output similar to the example below:
 => Push sent regarding visit <VisitId>
 ===> No campaign with matching target
 ```
+
+
+#### FAQ
+1. __What happens if a campaign arrives with same ID of some campaign already registered on MongoDB?__
+    * The __reader__ only performs [*upserts*](https://docs.mongodb.com/manual/reference/method/db.collection.update/#mongodb30-upsert-id)
+    operations to insert campaigns on database:
+        * If a campaign's ID does not exist at database, a new one is created.
+        * If a campaign's ID exists at database, the information of existing campaign is updated with 
+        information of arrived campaign (like an update).
+
+2. __What happens if a visit arrives with same ID of some previous visit?__
+    * The __publisher__ uses MongoDB to keep track of processed `visit_id`, thus if a visit
+    has been processed in the past (i.e. is repeated), the publisher just ignore it and 
+    doesn't forward it to NATS. Note that this is a anomalous situation since each visit must
+    have a unique ID.
+    
+3. __How to organize this architecture in terms of infrastructure?__
+    * The services reader, publisher and subscriber can run in different hosts in different subnets. The only advice
+    is that MongoDB should be placed at same subnet of publisher, because, since the publisher is the service with largest
+    volume of write and read operations on MongoDB, put them at same subnet will prevent eventual slowness. 
+    
+## 🔨 How to build
+
+This repository provides a Makefile to helps the process of building.
+You just have to execute this command in your terminal:
+```bash
+$ make build
+```
+This will generate three binary files:
+1. __./bin/reader__ - the reader service
+2. __./bin/pub__ - the publisher service
+3. __./bin/sub__ - the subscriber service
+    
+## 🏃🏽‍♀️ How to run
+
+#### Reader
+The reader binary requires two params to execute: 
+* `campaignfile` - the path to JSON file with campaigns to be loaded into
+database
+* `mongoconfig` - the path to JSON file with MongoDB config
+
+Example:
+```bash
+$ ./bin/reader -campaignfile=input/activeCampaigns.json -mongoconfig=etc/mongoConfig.json
+```
+
+#### Publisher
+The publisher binary requires three params to execute:
+* `natsconfig` - the path to JSON file with NATS config
+* `mongoconfig` - the path to JSON file with MongoDB config
+* `visitlogpath` - the path to file with log of visits
+
+Example:
+```bash
+$ ./bin/publisher -natsconfig=etc/natsConfig.json -mongoconfig=etc/mongoConfig.json -visitlogpath=input/visit.log
+```
+
+
+#### Subscriber
+The subscriber binary one param to execute:
+* `natsconfig` - the path to JSON file with NATS config
+
+Example:
+```bash
+$  ./bin/subscriber -natsconfig=etc/natsConfig.json
+```
+
+#### MongoDB and NATS Streaming Server
+This repository provides a docker-compose file to run 
+the required Mongo and NATS services. Just execute this command:
+```bash
+$ docker-compose up -d
+```
+
+__PS:__ 
+
+The `mongoconfig` file must follow this format:
+```json
+{
+  "url": "mongodb://127.0.0.1:27018",
+  "database": "pushcampaignsystem",
+  "campaign_collection": "campaigns",
+  "visit_collection": "visits"
+}
+```
+
+The `natsconfig` file must follow this format:
+```json
+{
+  "host": "localhost",
+  "port": 4223,
+  "cluster_id": "test-cluster",
+  "client_id": "publish-campaign-client",
+  "subject": "publish-campaign-subject",
+  "durable_name": "publish-campaign-durable"
+}
+```
+
+The JSON values doesn't need to be equal to the values above, these are just examples. 
+
