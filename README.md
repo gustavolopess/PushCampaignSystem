@@ -1,7 +1,7 @@
-# PushCampaignSystem
+# PushCampaignSystem 🛰🌎📲
 Ad toy system which allows clients to impact a mobile device when it is at a specific place with a push notification
 
-## Description
+## 📃 Description
 
 Clients can contract ad campaigns based on geolocation. These campaigns are defined by an identifier,
 a targeting, which is a list of places that must be visited by some device in order to get this device 
@@ -53,7 +53,7 @@ The overall idea is: if a place_id from some visit of visits log file is registe
 campaign, this system must send a push notification to device in this visit (reported in `DeviceId` field).
 The indicator that push notification were sent through campaign's provider is the output described above.
 
-## Requirements
+## ✅ Requirements
 
 * It must be easy to add a new push notification provider, which could have its own
   delivery logic.
@@ -61,7 +61,7 @@ The indicator that push notification were sent through campaign's provider is th
 * A campaign should not be delivered to a device if its location does not match any
   campaign's targeting.
   
- ## Architecture
+ ## 🏡 Architecture
  
 ![architecture](https://github.com/gustavolopess/PushCampaignSystem/blob/develop/assets/architecture.png "Architecture")
 
