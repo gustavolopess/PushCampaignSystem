@@ -140,7 +140,7 @@ type PushNotificationProvider interface {
 
 Yet at [provider_factory.go](https://github.com/gustavolopess/PushCampaignSystem/blob/develop/src/github.com/gustavolopess/PushCampaignSystem/app/providers/factory/provider_factory.go)
 there is a map of existent providers:
-```
+```go
 var existentProviders = map[string]PushNotificationProvider{
 	"localytics": &providers.Localytics{},
 	"mixpanel": &providers.MixPanel{},
