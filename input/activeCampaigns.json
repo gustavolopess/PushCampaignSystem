@@ -26,4 +26,15 @@
     "place_id": 9315,
     "description": "Cachaçaria Vicente"
   }]
+}, {
+  "id": 3,
+  "provider": "localytics",
+  "push_message": "Compre uma roupa aqui e fique bonitona",
+  "targeting": [{
+    "place_id": 43,
+    "description": "Alfaiataria da Dona Gertudes"
+  }, {
+    "place_id": 19,
+    "description": "Dona flor moda intima"
+  }]
 }]

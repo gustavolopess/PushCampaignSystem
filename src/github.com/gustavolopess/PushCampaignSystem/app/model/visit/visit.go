@@ -12,14 +12,13 @@ import (
 
 // Visit model
 type Visit struct {
-	ID			int64	`json:"id"`
-	PlaceId		int64	`json:"place_id"`
-	DeviceId	string	`json:"device_id"`
+	ID			int64	`json:"id" bson:"_id"`
+	PlaceId		int64	`json:"place_id" bson:"place_id"`
+	DeviceId	string	`json:"device_id" bson:"device_id"`
 }
 
 // regex expression to capture Visit in log lines
 var logLineRegex = regexp.MustCompile(`(?i)Visit:[\s\,]+?id=(?P<id>\d+)[\s\,]+?device_id=(?P<device_id>\w+)[\s\,]+?place_id=(?P<place_id>\d+)`)
-
 
 // Receives a log line and returns a Visit
 func ParseVisitFromLogLine(line string) (visit *Visit, err error) {
@@ -53,13 +52,13 @@ func (v *Visit) ListCampaigns(mongoCollection *mongo.Collection) (results []*cam
 	// Decode results into array of campaigns
 	for cursor.Next(ctx) {
 		// object to receive decoded document
-		var campaign campaign.Campaign
-		err = cursor.Decode(&campaign)
+		var camp campaign.Campaign
+		err = cursor.Decode(&camp)
 		if err != nil {
 			return
 		}
 
-		results = append(results, &campaign)
+		results = append(results, &camp)
 	}
 	err = cursor.Err()
 
@@ -77,9 +76,9 @@ func (v *Visit) Store(mongoCollection *mongo.Collection) (err error) {
 // Check if MongoDB has stored any visit with same ID
 func (v *Visit) HasBeenProcessed(mongoCollection *mongo.Collection) bool {
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	var result Visit
-	if err := mongoCollection.FindOne(ctx, bson.M{"_id": v.ID}).Decode(&result); err != nil {
-		return true
+	docsNumber, err := mongoCollection.CountDocuments(ctx, bson.M{"_id": v.ID})
+	if err != nil {
+		return false
 	}
-	return false
+	return docsNumber > 0
 }

@@ -5,11 +5,13 @@ services:
     image: "nats-streaming:latest"
     restart: always
     ports:
-      - 4223:4222
-      - 8222:8222
+      - "4223:4222"
+      - "8222:8222"
     volumes:
       - ./etc/nats.conf:/nats.conf
-    command: ['-c', '/nats.conf']
+    command: ['--config', '/nats.conf', '--store', 'file', '--dir', '/data']
+    networks:
+      - campaigns-net
 
   mongodb:
     image: "mongo:3.6.3"
@@ -17,4 +19,10 @@ services:
     environment:
       - MONGO_DATA_DIR=/data/db
     ports:
-      - 27018:27017
+      - "27018:27017"
+    networks:
+      - campaigns-net
+
+networks:
+  campaigns-net:
+    driver: bridge

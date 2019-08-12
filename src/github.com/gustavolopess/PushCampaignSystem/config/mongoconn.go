@@ -6,12 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"time"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
 var campaignCollection *mongo.Collection
 var visitCollection *mongo.Collection
 
@@ -49,7 +47,7 @@ func (m *MongoConn) Connect() {
 	}
 
 	// Check connection
-	ctx, _ = context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, _ = context.WithTimeout(context.Background(), 3*time.Second)
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatalf("Could not discovery a MongoDB server: %s", err.Error())
