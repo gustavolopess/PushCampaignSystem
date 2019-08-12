@@ -2,13 +2,13 @@
 Ad toy system which allows clients to impact a mobile device when it is at a specific place with a push notification
 
 ## Summary
-* [Description](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-description)
-* [Requirements](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-requirements)
-* [Architecture](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-architecture)
-	* [FAQ](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#faq)
-* [Providers](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-providers)
-* [How to build](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-how-to-build)
-* [How to run](https://github.com/gustavolopess/PushCampaignSystem/edit/develop/README.md#-how-to-run)
+* [Description](https://github.com/gustavolopess/PushCampaignSystem#-description)
+* [Requirements](https://github.com/gustavolopess/PushCampaignSystem#-requirements)
+* [Architecture](https://github.com/gustavolopess/PushCampaignSystem#-architecture)
+	* [FAQ](https://github.com/gustavolopess/PushCampaignSystem#faq)
+* [Providers](https://github.com/gustavolopess/PushCampaignSystem#-providers)
+* [How to build](https://github.com/gustavolopess/PushCampaignSystem#-how-to-build)
+* [How to run](https://github.com/gustavolopess/PushCampaignSystem#-how-to-run)
 	* [Reader](https://github.com/gustavolopess/PushCampaignSystem#reader)
 	* [Publisher](https://github.com/gustavolopess/PushCampaignSystem#publisher)
 	* [Subscriber](https://github.com/gustavolopess/PushCampaignSystem#subscriber)
