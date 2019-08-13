@@ -35,25 +35,6 @@ func findOneVisit(filter bson.M) (visit *Visit) {
 	return
 }
 
-//func findManyVisits(filter bson.M) (visits []*Visit) {
-//	cur, err := config.CampaignCollection().Find(context.Background(), filter)
-//	if err != nil {
-//		return
-//	}
-//
-//	for cur.Next(context.Background()) {
-//		var visit Visit
-//		err = cur.Decode(&camp)
-//		if err != nil {
-//			return
-//		}
-//
-//		campaigns = append(campaigns, &camp)
-//	}
-//
-//	return
-//}
-
 func TestParseVisitFromLogLine(t *testing.T) {
 	clearCollections()
 
