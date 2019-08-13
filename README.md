@@ -8,6 +8,7 @@ Ad toy system which allows clients to impact a mobile device when it is at a spe
 	* [FAQ](https://github.com/gustavolopess/PushCampaignSystem#faq)
 * [Providers](https://github.com/gustavolopess/PushCampaignSystem#-providers)
 * [How to build](https://github.com/gustavolopess/PushCampaignSystem#-how-to-build)
+* [How to test](https://github.com/gustavolopess/PushCampaignSystem#-how-to-test)
 * [How to run](https://github.com/gustavolopess/PushCampaignSystem#-how-to-run)
 	* [Reader](https://github.com/gustavolopess/PushCampaignSystem#reader)
 	* [Publisher](https://github.com/gustavolopess/PushCampaignSystem#publisher)
@@ -161,7 +162,7 @@ Example: `"newprovider": &newproviderpackage.NewProvider{}`
     
 ## 🔨 How to build
 
-This repository provides a Makefile to helps the process of building.
+This repository provides a Makefile to help you with process of building.
 You just have to execute this command in your terminal:
 ```bash
 $ make build
@@ -170,7 +171,16 @@ This will generate three binary files:
 1. __./bin/reader__ - the reader service
 2. __./bin/pub__ - the publisher service
 3. __./bin/sub__ - the subscriber service
-    
+
+## 🧩 How to test
+This repository provides a Makefile to help you with process of testing.
+You just have to execute this command in your terminal:
+```bash
+$ make test
+```
+This command will run all existent unit tests. In order to do this, a file with config to MongoDB tests collection is
+indispensable. You should put your MongoDB tests configuration in `./etc/mongoConfigTests.json`.
+
 ## 🏃🏽‍♀️ How to run
 
 #### Reader
