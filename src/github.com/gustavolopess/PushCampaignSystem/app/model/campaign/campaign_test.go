@@ -22,8 +22,11 @@ func init() {
 	mongoConn.LoadConfig(mongoconfigtests)
 
 	mongoConn.Connect()
+}
 
+func clearCollections() {
 	_ = config.CampaignCollection().Drop(context.Background())
+	_ = config.VisitCollection().Drop(context.Background())
 }
 
 func findOneCampaign(filter bson.M) (campaign *Campaign) {
@@ -54,17 +57,19 @@ func findManyCampaigns(filter bson.M) (campaigns []*Campaign) {
 }
 
 func TestCampaign_Store(t *testing.T) {
+	clearCollections()
+
 	tests := []struct {
 		name string
 		campaign Campaign
 		validate func() bool
 	}{
 		{
-			"TestCampaign_StoreOne - Create event",
+			"TestCampaign_Store - Create event",
 			Campaign{
 				1,
 				"localytics",
-				"TestCampaign_StoreOnes",
+				"TestCampaign_Store",
 				[]Place{
 					{
 						1,
@@ -86,11 +91,11 @@ func TestCampaign_Store(t *testing.T) {
 			},
 		},
 		{
-			"TestCampaign_StoreOne - Upsert event",
+			"TestCampaign_Store - Upsert event",
 			Campaign{
 				1,
 				"localytics",
-				"TestCampaign_StoreOne",
+				"TestCampaign_Store",
 				[]Place{
 					{
 						1,
@@ -133,6 +138,8 @@ func TestCampaign_Store(t *testing.T) {
 
 
 func TestStoreMultiple(t *testing.T) {
+	clearCollections()
+
 	campaign1 := Campaign{
 		55,
 		"localytics",
@@ -234,6 +241,8 @@ func TestStoreMultiple(t *testing.T) {
 }
 
 func TestLoadCampaigns(t *testing.T) {
+	clearCollections()
+
 	strCampaigns := []byte(`
 [
   {
