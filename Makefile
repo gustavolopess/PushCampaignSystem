@@ -1,3 +1,5 @@
+BASE_PATH        := $(shell pwd | sed 's/ /\\ /g')
+
 BASE_PACKAGE		:= github.com/gustavolopess/PushCampaignSystem
 BASE_PACKAGE_SRC 	:= src/$(BASE_PACKAGE)
 
@@ -9,7 +11,11 @@ PUBLISHER_BIN		:= publisher
 SUBSCRIBER_BIN		:= subscriber
 READER_BIN			:= reader
 
-all: mod build run-publisher run-subscriber
+# config for unit tests' databae
+MONGO_CONFIG_TESTS	:= "$(BASE_PATH)/etc/mongoConfigTests.json"
+
+
+all: mod build test
 
 mod:
 	@cd $(BASE_PACKAGE_SRC) && go mod init $(BASE_PACKAGE)
@@ -25,3 +31,7 @@ build:
 	@mv $(BASE_PACKAGE_SRC)/$(SUBSCRIBER_BIN) bin/$(SUBSCRIBER_BIN)
 	@cd $(BASE_PACKAGE_SRC) && go build -o $(READER_BIN) $(READER_MAIN)
 	@mv $(BASE_PACKAGE_SRC)/$(READER_BIN) bin/$(READER_BIN)
+
+test:
+	@cd $(BASE_PACKAGE_SRC) && go test -v ./app/model/campaign -mongoconfigtests=$(MONGO_CONFIG_TESTS)
+	@cd $(BASE_PACKAGE_SRC) && go test -v ./app/model/visit
