@@ -38,27 +38,39 @@ func TestLoadMessage(t *testing.T) {
 		},
 		{
 			"LoadMesssage with invalid message (missing provider)",
-			[]byte(`{"visit_id": 12345, "push_message": "lorem ipsum dolor", "device_id": "dev12345", "has_campaign": false}`),
+			[]byte(`{"visit_id": 12345, "push_message": "lorem ipsum dolor", "device_id": "dev12345", "has_campaign": true}`),
 			nil,
 			true,
 		},
 		{
 			"LoadMesssage with invalid message (missing push_message)",
-			[]byte(`{"visit_id": 12345, "provider": "localytics", "device_id": "dev12345", "has_campaign": false}`),
+			[]byte(`{"visit_id": 12345, "provider": "localytics", "device_id": "dev12345", "has_campaign": true}`),
 			nil,
 			true,
 		},
 		{
 			"LoadMesssage with invalid message (missing visit_id)",
-			[]byte(`{"provider": "localytics", "push_message": "lorem ipsum dolor", "device_id": "dev12345", "has_campaign": false}`),
+			[]byte(`{"provider": "localytics", "push_message": "lorem ipsum dolor", "device_id": "dev12345", "has_campaign": true}`),
 			nil,
 			true,
 		},
 		{
 			"LoadMesssage with invalid message (missing device_id)",
-			[]byte(`{"visit_id": 12345, "provider": "localytics", "push_message": "lorem ipsum dolor", "has_campaign": false}`),
+			[]byte(`{"visit_id": 12345, "provider": "localytics", "push_message": "lorem ipsum dolor", "has_campaign": true}`),
 			nil,
 			true,
+		},
+		{
+			"LoadMesssage with invalid message (missing visit_id and other fields and has_campaign is false)",
+			[]byte(`{"has_campaign": true}`),
+			nil,
+			true,
+		},
+		{
+			"LoadMesssage with valid message (missing fields but has_campaign is false)",
+			[]byte(`{"visit_id": 12345, "has_campaign": false}`),
+			nil,
+			false,
 		},
 		{
 			"LoadMesssage with valid message #3",

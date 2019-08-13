@@ -38,6 +38,11 @@ func (n *NatsMessage) Validate() error {
 		return fmt.Errorf("message without visit_id")
 	}
 
+	// If message does not belong to any campaign, it's not necessary to have fields below
+	if !n.HasCampaign {
+		return nil
+	}
+
 	if n.Provider == "" {
 		return fmt.Errorf("message without provider")
 	}
