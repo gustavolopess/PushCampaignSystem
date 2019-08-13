@@ -2,6 +2,7 @@ package visit
 
 import (
 	"context"
+	"fmt"
 	"github.com/gustavolopess/PushCampaignSystem/app/model/campaign"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,6 +24,10 @@ var logLineRegex = regexp.MustCompile(`(?i)Visit:[\s\,]+?id=(?P<id>\d+)[\s\,]+?d
 // Receives a log line and returns a Visit
 func ParseVisitFromLogLine(line string) (visit *Visit, err error) {
 	match := logLineRegex.FindStringSubmatch(line)
+	if len(match) != 4 {
+		return nil, fmt.Errorf("invalid log line")
+	}
+
 	matchedID, err := strconv.Atoi(match[1])
 	matchedPlaceID, err := strconv.Atoi(match[3])
 	if err != nil {
