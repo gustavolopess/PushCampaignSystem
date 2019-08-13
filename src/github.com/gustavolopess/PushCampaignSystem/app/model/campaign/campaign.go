@@ -3,6 +3,7 @@ package campaign
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -33,7 +34,40 @@ func LoadCampaigns(filePath string) (campaigns []Campaign, err error) {
 	}
 
 	err = json.Unmarshal(fileData, &campaigns)
+	if err != nil {
+		return
+	}
+
+	// Check if all campaigns are valid
+	for _, campaign := range campaigns {
+		if err = campaign.Valid(); err != nil {
+			return
+		}
+	}
+
 	return
+}
+
+
+// Check whether required fields are empty
+func (c *Campaign) Valid() error {
+	if c == nil {
+		return fmt.Errorf("nil pointer campaign")
+	}
+
+	if c.ID ==  0 {
+		return fmt.Errorf("campaign without ID")
+	}
+
+	if c.Provider == "" {
+		return fmt.Errorf("campaign without provider")
+	}
+
+	if c.PushMessage == "" {
+		return fmt.Errorf("campaign without push_message")
+	}
+
+	return nil
 }
 
 // Store campaign on database

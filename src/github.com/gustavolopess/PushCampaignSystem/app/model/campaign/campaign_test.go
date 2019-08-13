@@ -5,6 +5,9 @@ import (
 	"flag"
 	"github.com/gustavolopess/PushCampaignSystem/config"
 	"go.mongodb.org/mongo-driver/bson"
+	"io/ioutil"
+	"os"
+	"reflect"
 	"testing"
 )
 
@@ -50,7 +53,7 @@ func findManyCampaigns(filter bson.M) (campaigns []*Campaign) {
 	return
 }
 
-func TestCampaign_StoreOne(t *testing.T) {
+func TestCampaign_Store(t *testing.T) {
 	tests := []struct {
 		name string
 		campaign Campaign
@@ -129,7 +132,7 @@ func TestCampaign_StoreOne(t *testing.T) {
 }
 
 
-func TestCampaign_StoreMultiple(t *testing.T) {
+func TestStoreMultiple(t *testing.T) {
 	campaign1 := Campaign{
 		55,
 		"localytics",
@@ -227,5 +230,122 @@ func TestCampaign_StoreMultiple(t *testing.T) {
 		} else if !tt.validate() {
 			t.Errorf("Test validation failed")
 		}
+	}
+}
+
+func TestLoadCampaigns(t *testing.T) {
+	strCampaigns := []byte(`
+[
+  {
+    "id": 876,
+    "provider": "localytics",
+    "push_message": "Magna ad aute ad aliqua excepteur excepteur quis esse ad dolor enim incididunt.",
+    "targeting": [
+      {
+        "place_id": 4155,
+        "description": "Krag"
+      },
+      {
+        "place_id": 7722,
+        "description": "Genesynk"
+      },
+      {
+        "place_id": 4940,
+        "description": "Frosnex"
+      }
+    ]
+  },
+  {
+    "id": 7248,
+    "provider": "localytics",
+    "push_message": "Pariatur qui esse est aliqua dolore elit cillum fugiat anim eiusmod non enim tempor amet.",
+    "targeting": [
+      {
+        "place_id": 4173,
+        "description": "Centice"
+      },
+      {
+        "place_id": 7526,
+        "description": "Rodemco"
+      },
+      {
+        "place_id": 4222,
+        "description": "Intergeek"
+      }
+    ]
+  }]
+`)
+
+	expectedOutput := []Campaign{
+		{
+			876,
+			"localytics",
+			"Magna ad aute ad aliqua excepteur excepteur quis esse ad dolor enim incididunt.",
+			[]Place{{4155, "Krag"}, {7722, "Genesynk"}, {4940, "Frosnex"}},
+		},
+		{
+			7248,
+			"localytics",
+			"Pariatur qui esse est aliqua dolore elit cillum fugiat anim eiusmod non enim tempor amet.",
+			[]Place{{4173, "Centice"}, {7526, "Rodemco"}, {4222, "Intergeek"}},
+		},
+	}
+
+	validTempFile, err := ioutil.TempFile("", "testCampaigns_valid.json")
+	if err != nil {
+		t.Errorf("Could not create validTempFile with fictional campaigns: %v", err)
+	}
+	defer os.Remove(validTempFile.Name())
+
+
+	invalidTempFile, err := ioutil.TempFile("","testCampaigns_invalid.json")
+	if err != nil {
+		t.Errorf("Could not create invalidTempFile with fictional campaigns: %v", err)
+	}
+	defer os.Remove(invalidTempFile.Name())
+
+
+	if _, err = validTempFile.Write(strCampaigns); err != nil {
+		t.Errorf("Could not write fictional campaigns to validTempFile %v", err)
+	}
+
+	if _, err = invalidTempFile.Write([]byte(`[{"id": 777}, {"push_message": "lhebs"}]`)); err != nil {
+		t.Errorf("Could not write fictional campaigns to validTempFile %v", err)
+	}
+
+	tests := []struct {
+		name string
+		campaignFilePath string
+		expetedCampaigns []Campaign
+		wantError bool
+	}{
+		{
+			"Decode a JSON with valid campaigns",
+			validTempFile.Name(),
+			expectedOutput,
+			false,
+		},
+		{
+			"Decode a JSON with invalid campaigns",
+			invalidTempFile.Name(),
+			nil,
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Logf("Running %s", tt.name)
+		campaigns, err := LoadCampaigns(tt.campaignFilePath)
+		if tt.wantError && err == nil {
+			t.Errorf("LoadCampaigns() not throwing correct error (wantError=%v, Decoded=%v)", tt.wantError, campaigns)
+		} else if !tt.wantError && err != nil {
+			t.Errorf("LoadCampaigns() error = %v (wantError=%v)", err, tt.wantError)
+		} else if !tt.wantError && !reflect.DeepEqual(campaigns, tt.expetedCampaigns) {
+			t.Errorf("Decoded campaigns different from expected. (Decoded=%v, Expected=%v)", campaigns, tt.expetedCampaigns)
+		}
+	}
+
+	if err = validTempFile.Close(); err != nil {
+		t.Errorf("Could not close validTempFile %v", err)
 	}
 }
