@@ -126,7 +126,7 @@ func TestCampaign_Store(t *testing.T) {
 		if err != nil {
 			t.Errorf("Campaign.Store() error = %v", err)
 		} else if !tt.validate() {
-			t.Errorf("Test validation failed")
+			t.Errorf("Campaign.Store(): Test validation failed")
 		}
 	}
 }
@@ -226,9 +226,9 @@ func TestStoreMultiple(t *testing.T) {
 		t.Logf("Running %s", tt.name)
 		err := StoreMultiple(tt.campaigns, config.CampaignCollection())
 		if err != nil {
-			t.Errorf("StoreMultiple() error = %v", err)
+			t.Errorf("StoreMultiple(): error = %v", err)
 		} else if !tt.validate() {
-			t.Errorf("Test validation failed")
+			t.Errorf("StoredMultiple(): Test validation failed")
 		}
 	}
 }
@@ -336,12 +336,10 @@ func TestLoadCampaigns(t *testing.T) {
 	for _, tt := range tests {
 		t.Logf("Running %s", tt.name)
 		campaigns, err := LoadCampaigns(tt.campaignFilePath)
-		if tt.wantError && err == nil {
-			t.Errorf("LoadCampaigns() not throwing correct error (wantError=%v, Decoded=%v)", tt.wantError, campaigns)
-		} else if !tt.wantError && err != nil {
-			t.Errorf("LoadCampaigns() error = %v (wantError=%v)", err, tt.wantError)
+		if (err != nil) != tt.wantError {
+			t.Errorf("LoadCampaigns(): undesired error behaviour (%v, wantError=%v, Decoded=%v)", err, tt.wantError, campaigns)
 		} else if !tt.wantError && !reflect.DeepEqual(campaigns, tt.expetedCampaigns) {
-			t.Errorf("Decoded campaigns different from expected. (Decoded=%v, Expected=%v)", campaigns, tt.expetedCampaigns)
+			t.Errorf("LoadCampaigns(): decoded campaigns are different from expected (Decoded=%v, Expected=%v)", campaigns, tt.expetedCampaigns)
 		}
 	}
 
