@@ -37,4 +37,15 @@
     "place_id": 19,
     "description": "Dona flor moda intima"
   }]
+}, {
+  "id": 4,
+  "provider": "fastmessage",
+  "push_message": "O melhor vinho é aqui!",
+  "targeting": [{
+    "place_id": 78,
+    "description": "Vinícola do português"
+  }, {
+    "place_id": 3,
+    "description": "Seu Bartô vinhos italianos"
+  }]
 }]
