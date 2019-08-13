@@ -1,0 +1,51 @@
+[{
+  "id": 1,
+  "provider": "localytics",
+  "push_message": "Peça Pizza com o nosso Cupom de deconto agora, não se esqueça!",
+  "targeting": [{
+    "place_id": 32,
+    "description": "Pizzaria Recife Antigo"
+  }, {
+    "place_id": 28,
+    "description": "Pizzaria Casa Forte"
+  }, {
+    "place_id": 329,
+    "description": "Pizzaria Índico"
+  }]
+}, {
+  "id": 2,
+  "provider": "mixpanel",
+  "push_message": "Peça o drink do dia! Se beber, não dirija.: )",
+  "targeting": [{
+    "place_id": 12,
+    "description": "Bar do zé"
+  }, {
+    "place_id": 65,
+    "description": "Drinks Lounge"
+  }, {
+    "place_id": 9315,
+    "description": "Cachaçaria Vicente"
+  }]
+}, {
+  "id": 3,
+  "provider": "localytics",
+  "push_message": "Compre uma roupa aqui e fique bonitona",
+  "targeting": [{
+    "place_id": 43,
+    "description": "Alfaiataria da Dona Gertudes"
+  }, {
+    "place_id": 19,
+    "description": "Dona flor moda intima"
+  }]
+}, {
+  "id": 4,
+  "provider": "fastmessage",
+  "push_message": "O melhor vinho é aqui!",
+  "targeting": [{
+    "place_id": 78,
+    "description": "Vinícola do português"
+  }, {
+    "place_id": 3,
+    "description": "Seu Bartô vinhos italianos"
+  }]
+}]
