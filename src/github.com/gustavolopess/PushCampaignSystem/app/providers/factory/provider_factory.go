@@ -14,6 +14,7 @@ type PushNotificationProvider interface {
 var existentProviders = map[string]PushNotificationProvider{
 	"localytics": &providers.Localytics{},
 	"mixpanel": &providers.MixPanel{},
+	"fastmessage": &providers.FastMessage{},
 }
 
 // Return provider based on its name
