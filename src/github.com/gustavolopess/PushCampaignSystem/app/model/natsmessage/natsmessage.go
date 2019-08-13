@@ -28,16 +28,45 @@ var withoutCampaignOutputTemplate =
 ===> No campaign with matching target
 `
 
-func (n *NatsMessage) LoadMessage(data []byte) (err error) {
-	err = json.Unmarshal(data, &n)
-	return
+// Check whether required fields are empty
+func (n *NatsMessage) Validate() error {
+	if n == nil {
+		return fmt.Errorf("nil pointer message")
+	}
+
+	if n.VisitId ==  0 {
+		return fmt.Errorf("message without visit_id")
+	}
+
+	if n.Provider == "" {
+		return fmt.Errorf("message without provider")
+	}
+
+	if n.PushMessage == "" {
+		return fmt.Errorf("message without push_message")
+	}
+
+	if n.DeviceId == "" {
+		return fmt.Errorf("message without device_id")
+	}
+
+	return nil
 }
 
+// Decode JSON message into NatsMessage
+func LoadMessage(data []byte) (natsMessage NatsMessage, err error) {
+	err = json.Unmarshal(data, &natsMessage)
+	if err != nil {
+		return
+	}
+
+	return natsMessage, natsMessage.Validate()
+}
 
 func OnMessage(data []byte) {
 	// Unmarshal message
-	var natsMessage NatsMessage
-	if err := json.Unmarshal(data, &natsMessage); err != nil {
+	natsMessage, err := LoadMessage(data)
+	if err != nil {
 		log.Fatalf("Invalid NATS message %s: %s", data, err.Error())
 		return
 	}
@@ -58,7 +87,7 @@ func OnMessage(data []byte) {
 		// Send campaign's push notification
 		err = provider.SendPushNotification(natsMessage.PushMessage, natsMessage.DeviceId)
 		if err != nil {
-			log.Println("Could not send push notification: %s", err.Error())
+			log.Printf("Could not send push notification: %s", err.Error())
 			return
 		}
 

@@ -35,3 +35,4 @@ build:
 test:
 	@cd $(BASE_PACKAGE_SRC) && go test -v ./app/model/campaign -mongoconfigtests=$(MONGO_CONFIG_TESTS)
 	@cd $(BASE_PACKAGE_SRC) && go test -v ./app/model/visit -mongoconfigtests=$(MONGO_CONFIG_TESTS)
+	@cd $(BASE_PACKAGE_SRC) && go test -v ./app/model/natsmessage
